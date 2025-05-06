@@ -36,8 +36,8 @@ Before setting up the project, ensure you have the following installed:
 ## Installation
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/employee-management-system.git
-   cd employee-management-system
+   git clone https://github.com/Nitinadhikari01/HRMS.git
+   cd HRMS
    ```
 2. **Set Up a Virtual Environment**:
    ```bash
