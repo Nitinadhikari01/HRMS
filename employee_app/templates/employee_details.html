@@ -1,0 +1,318 @@
+{% load humanize %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    #uni_modal .modal-footer {
+        display: none;
+    }
+
+    #employeeTabContent {
+        height: 400px; /* Reduced from 300px */
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .container-sm {
+        max-width: 800px;
+        min-height: 530px; /* Reduced from 350px */
+        overflow: hidden;
+    }
+
+    .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .nav-link {
+        color: #495057;
+        font-weight: 600;
+        padding: 0.6rem 0.6rem;
+        border: none;
+        border-radius: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .nav-link.active {
+        color: #0d6efd;
+        border-bottom: 3px solid #0d6efd;
+    }
+
+    label.control-label {
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        display: block;
+        margin-bottom: 0.3rem;
+        font-weight: bold;
+    }
+
+    input.form-control,
+    select.form-select,
+    textarea.form-control {
+        border-radius: 6px;
+        padding: 0.45rem 0.65rem;
+        font-size: 0.95rem;
+        border: 1px solid #ced4da;
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .img-thumbnail {
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    .small {
+        font-size: 0.75rem;
+    }
+
+    .tab-pane {
+        padding-top: 1rem;
+    }
+</style>
+
+<div class="container-sm">
+    <ul class="nav nav-tabs" id="employeeTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab">Personal Details</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="professional-tab" data-bs-toggle="tab" data-bs-target="#professional" type="button" role="tab">Professional Details</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="emergency-tab" data-bs-toggle="tab" data-bs-target="#emergency" type="button" role="tab">Emergency Contact</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">Documents</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pay_compensation-tab" data-bs-toggle="tab" data-bs-target="#pay_compensation" type="button" role="tab">Pay Compensation</button>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-3" id="employeeTabContent">
+        <!-- Personal Details -->
+        <div class="tab-pane fade show active" id="personal" role="tabpanel">
+            <div class="row">
+                <div class="col-md-3 text-center mb-4">
+                    <label for="emp_img" class="control-label fw-bolder d-block text-start">Profile Photo</label>
+                    {% if employee.emp_img %}
+                        <div class="mt-2">
+                            <img src="{{ employee.emp_img.url }}" class="img-thumbnail shadow-sm" style="max-width: 100%; height: auto;">
+                            <p class="small text-muted mt-1">Current Photo</p>
+                        </div>
+                    {% else %}
+                        <div class="border p-2 bg-light rounded">
+                            <p class="small text-muted m-0">No profile photo available.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-9">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="code" class="control-label fw-bolder">Employee ID/Code</label>
+                            <input type="text" name="code" id="code" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.emp_code %}{{employee.emp_code}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="firstname" class="control-label fw-bolder">First Name</label>
+                            <input type="text" name="firstname" id="firstname" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.firstname %}{{employee.firstname}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="middlename" class="control-label fw-bolder">Middle Name</label>
+                            <input type="text" name="middlename" id="middlename" class="form-control form-control-sm rounded-0" value="{% if employee.middlename %}{{employee.middlename}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="lastname" class="control-label fw-bolder">Last Name</label>
+                            <input type="text" name="lastname" id="lastname" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.lastname %}{{employee.lastname}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="gender" class="control-label fw-bolder">Gender</label>
+                            <select name="gender" id="gender" class="form-select form-select-sm rounded-0 validation_required" disabled>
+                                <option {% if employee.gender == 'Male' %}selected{% endif %}>Male</option>
+                                <option {% if employee.gender == 'Female' %}selected{% endif %}>Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="dob" class="control-label fw-bolder">Birthday</label>
+                            <input type="date" name="dob" id="dob" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.dob %}{{ employee.dob|date:'Y-m-d' }}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="email" class="control-label fw-bolder">Email</label>
+                            <input type="email" name="email" id="email" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.email %}{{employee.email}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="marital_status" class="control-label fw-bolder">Marital Status</label>
+                            <input type="text" name="marital_status" id="marital_status" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.marital_status %}{{employee.marital_status}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="contact" class="control-label fw-bolder">Contact Number</label>
+                            <input type="number" name="contact" id="contact" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.contact %}{{employee.contact}}{% endif %}" readonly>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="address" class="control-label fw-bolder">Address</label>
+                            <textarea rows="3" name="address" id="address" class="form-control form-control-sm rounded-0 validation_required" readonly>{% if employee.address %}{{employee.address}}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Details -->
+        <div class="tab-pane fade" id="professional" role="tabpanel">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="department_id" class="control-label fw-bolder">Department</label>
+                    <select name="department_id" id="department_id" class="form-select form-select-sm rounded-0 validation_required" disabled>
+                        <option value="1" disabled {% if not employee.department_id %}selected{% endif %}>Please Select Here</option>
+                        {% for department in departments %}
+                            <option value="{{ department.id }}" {% if employee.department_id == department.id %}selected{% endif %}>{{ department.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="position_id" class="control-label fw-bolder">Designations</label>
+                    <select name="position_id" id="position_id" class="form-select form-select-sm rounded-0 validation_required" disabled>
+                        <option value="1" disabled {% if not employee.position_id %}selected{% endif %}>Please Select Here</option>
+                        {% for position in positions %}
+                            <option value="{{ position.id }}" {% if employee.position_id == position.id %}selected{% endif %}>{{ position.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="reporting_mng" class="control-label fw-bolder">Reporting Manager</label>
+                    <input type="text" name="reporting_mng" id="reporting_mng" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.reporting_mng %}{{ employee.reporting_mng }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="education_qualification" class="control-label fw-bolder">Education Qualification</label>
+                    <input type="text" name="education_qualification" id="education_qualification" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.education_qualification %}{{ employee.education_qualification }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="last_emp_details" class="control-label fw-bolder">Last Employer Details</label>
+                    <input type="text" name="last_emp_details" id="last_emp_details" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.last_emp_details %}{{ employee.last_emp_details }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="date_hired" class="control-label fw-bolder">Date Hired</label>
+                    <input type="date" name="date_hired" id="date_hired" class="form-control form-control-sm rounded-0" value="{% if employee.date_hired %}{{ employee.date_hired|date:'Y-m-d' }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="salary" class="control-label fw-bolder">Monthly Salary</label>
+                    <input type="number" step="any" name="salary" id="salary" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.salary %}{{employee.salary}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="status" class="control-label fw-bolder">Status</label>
+                    <select name="status" id="status" class="form-select form-select-sm rounded-0 validation_required" disabled>
+                        <option value="1" {% if employee.status == 1 %}selected{% endif %}>Active</option>
+                        <option value="0" {% if employee.status == 0 %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="tab-pane fade" id="emergency" role="tabpanel">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="emergency_contact_name" class="control-label fw-bolder">Person Name</label>
+                    <input type="text" name="emergency_contact_name" id="emergency_contact_name" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.emergency_contact_name %}{{ employee.emergency_contact_name }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="emergency_contact_number" class="control-label fw-bolder">Contact Number</label>
+                    <input type="number" name="emergency_contact_number" id="emergency_contact_number" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.emergency_contact_number %}{{ employee.emergency_contact_number }}{% endif %}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents -->
+        <div class="tab-pane fade" id="documents" role="tabpanel">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="control-label fw-bolder">Appointment Document</label>
+                    {% if employee.document and employee.document.appointment_document %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.appointment_document.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No appointment document available.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="control-label fw-bolder">Offer Letter</label>
+                    {% if employee.document and employee.document.offer_letter %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.offer_letter.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No offer letter available.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="control-label fw-bolder">Company Policies</label>
+                    {% if employee.document and employee.document.company_policies %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.company_policies.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No company policies document available.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Salary Slip Tab -->
+        <div class="tab-pane fade" id="pay_compensation" role="tabpanel">
+            <div class="row g-3">
+                <!-- For the Yearly Salary-->
+                <h5>Yearly Salary</h5>
+                <div class="col-md-4">
+                    <label for="total_salary" class="control-label fw-bolder required">Total CTC</label>
+                    <input type="text" name="total_salary" id="total_salary" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="fixed_salary" class="control-label fw-bolder required">Fixed Salary</label>
+                    <input type="text" name="fixed_salary" id="fixed_salary" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="variable_salary" class="control-label fw-bolder required">Variable Salary</label>
+                    <input type="text" name="variable_salary" id="variable_salary" class="form-control form-control-sm rounded-0" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <!-- For the Monthly Salary-->
+                <h5>Monthly Salary</h5>
+                <div class="col-md-4">
+                    <label for="salary" class="control-label fw-bolder required">Monthly Total Salary</label>
+                    <input type="number" step="any" name="salary" id="salary" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee.salary %}{{employee.salary}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="basic_salary" class="control-label fw-bolder required">Basic Salary</label>
+                    <input type="text" name="basic_salary" id="basic_salary" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="hra" class="control-label fw-bolder required">HRA</label>
+                    <input type="text" name="hra" id="hra" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{ employee. }}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="pf" class="control-label fw-bolder required">PF</label>
+                    <input type="text" name="pf" id="pf" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="gratuity" class="control-label fw-bolder required">Gratuity</label>
+                    <input type="text" name="gratuity" id="gratuity" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label for="medical" class="control-label fw-bolder required">Medical</label>
+                    <input type="text" name="medical" id="medical" class="form-control form-control-sm rounded-0 validation_required" value="{% if employee. %}{{employee.}}{% endif %}" readonly>
+                </div>
+
+            </div>
+
+            <h1>working on it!!</h1>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,1012 @@
+{% load custom_filters %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {% if page_title %}
+    <title>{{ page_title }} | EMS</title>
+  {% else %}
+    <title>EMS</title>
+  {% endif %}
+  <link rel="shortcut icon" href="{% static 'employee_information/assets/material-admin/images/www.png' %}" />
+
+  <!-- Required CSS -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Internal CSS -->
+  <style>
+    :root {
+      --primary-color: #5a321a;
+      --secondary-color: #ecf0f1;
+      --text-color: #34495e;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --accent-color: #874000;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      background: linear-gradient(135deg, #E8CBC0, var(--accent-color));
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 0.75rem 1.5rem;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 1.75rem;
+      color: white !important;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-link {
+      color: black;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .material-icons.md-18 {
+      font-size: 1.25rem;
+    }
+
+    /* Dashboard Styles */
+    .dashboard {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      padding: 2rem;
+      margin: 2rem auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 0.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2,
+    h3 {
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .action-btn:hover {
+      background: var(--accent-color);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      opacity: 0.9;
+      animation: fadeSlide 0.3s ease;
+      font-weight: 500;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        transform: translateX(-50%) translateY(10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+      .holiday-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-top: -2rem;
+        z-index: 1;
+    }
+
+    .holiday-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+
+    .pdf-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f8f9fa;
+    }
+
+    .pdf-overlay {
+        position: absolute;
+        inset: 0;
+        opacity: 0.15;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .pdf-container:hover .pdf-overlay {
+        opacity: 0.25;
+    }
+
+    @media (max-width: 768px) {
+        .holiday-card {
+            margin-top: 1rem;
+        }
+
+        .pdf-container iframe {
+            height: 300px !important;
+        }
+    }
+
+      .leave-card {
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .leave-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .month-badge {
+            min-width: 30px;
+            height: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .month-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #34495e;
+        }
+
+        @media (max-width: 576px) {
+            .leave-card {
+                flex-direction: row;
+                padding: 0.75rem;
+            }
+
+            .month-badge {
+                margin-right: 0.5rem;
+            }
+        }
+  </style>
+
+  <!-- Asset Details Modal -->
+  <style>
+    /* Modal Styling */
+    #assetModal .modal-dialog {
+      max-width: 800px;
+      width: 100%;
+      margin: 1.5rem auto;
+      height: 600px;
+      max-height: 650px;
+      overflow-y: auto;
+    }
+
+    #assetModal .modal-content {
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      height: 100%;
+    }
+
+    #assetModal .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #f8faff;
+      border-bottom: 1px solid #e3ebf6;
+    }
+
+    #assetModal .modal-title {
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    #assetModal .modal-body {
+      padding: 1.5rem;
+      height: calc(100% - 100px);
+      background-color: #ffffff;
+    }
+
+    /* Form Typography */
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    form label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #34495e;
+    }
+
+    form .form-control {
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #ccc;
+    }
+
+    form .btn-primary {
+      padding: 0.4rem 1rem;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      transition: all 0.2s ease-in-out;
+    }
+
+    form .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+    }
+
+    .nav-tabs .nav-link {
+      font-weight: 600;
+      color: #495057;
+      border-radius: 6px 6px 0 0;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+      color: #007bff;
+      background-color: #e9f0ff;
+      border-color: #007bff;
+      font-weight: 700;
+    }
+
+    .scrollable-table {
+      max-height: 430px;
+      overflow-y: auto;
+      border-radius: 8px;
+      border: 1px solid #dee2e6;
+      background-color: #ffffff;
+    }
+
+    .scrollable-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .scrollable-table th,
+    .scrollable-table td {
+      padding: 10px 12px;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #2c3e50;
+    }
+
+    .scrollable-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background-color: #f1f5fa;
+      font-weight: 600;
+      border-bottom: 2px solid #e3ebf6;
+    }
+
+    .scrollable-table tbody tr:nth-child(even) {
+      background-color: #fafcff;
+    }
+
+    .scrollable-table tbody tr:hover {
+      background-color: #edf4ff;
+    }
+
+    @media (max-width: 576px) {
+      .scrollable-table th,
+      .scrollable-table td {
+        font-size: 0.8rem;
+        padding: 8px;
+      }
+    }
+
+    /* Button Style Reference */
+    .icon-button {
+      padding: 6px !important;
+      min-width: auto !important;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .filled-button--danger {
+      background-color: #ffd8d8;
+      color: #d92525;
+    }
+
+    .filled-button--danger:hover {
+      background-color: #ffb8b8;
+      transform: translateY(-1px);
+    }
+  </style>
+
+  <!-- Exit Details Modal -->
+  <style>
+    /* Modal Styling */
+    #exitModal .modal-dialog {
+      max-width: 800px;
+      width: 100%;
+      margin: 1.5rem auto;
+      height: 600px;
+      max-height: 650px;
+      overflow-y: auto;
+    }
+
+    #exitModal .modal-content {
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      height: 100%;
+    }
+
+    #exitModal .modal-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: #f8faff;
+      border-bottom: 1px solid #e3ebf6;
+    }
+
+    #exitModal .modal-title {
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    #exitModal .modal-body {
+      padding: 1.5rem;
+      background-color: #ffffff;
+      height: calc(100% - 100px);
+    }
+
+    /* Form Typography */
+    h4 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    form label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #34495e;
+    }
+
+    form .form-select,
+    form .form-control {
+      border-radius: 6px;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #ced4da;
+    }
+
+    form .btn-primary {
+      padding: 0.4rem 1rem;
+      font-size: 0.875rem;
+      border-radius: 6px;
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: all 0.2s ease-in-out;
+    }
+
+    form .btn-primary:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Checkbox Style */
+    .form-check-input {
+      width: 1.2em;
+      height: 1.2em;
+      margin-top: 0.25rem;
+      vertical-align: top;
+    }
+
+    .form-check-label {
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      color: #2c3e50;
+    }
+
+    .form-group.checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .col-md-4.mb-3 {
+        width: 100%;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center">EMS
+
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+        aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="topNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="{% url 'employee-dashboard-page' %}">-->
+<!--              <i class="material-icons md-18">home</i> Home-->
+<!--            </a>-->
+<!--          </li>-->
+<!--          <li class="nav-item">-->
+<!--            <a class="nav-link" href="">-->
+<!--              <i class="material-icons md-18">group</i> Employee-->
+<!--            </a>-->
+<!--          </li>-->
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <img src="{% static 'employee_information/assets/material-admin/images/profile.jpg' %}" alt="User"
+                class="rounded-circle me-2" width="32" />
+              {{ user|upper }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'logoutuser' %}">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container-fluid p-0 flex-grow-1">
+    <div class="card mb-4 mx-3 mt-3">
+      {% for employee in employees %}
+        <div class="card-body text-center">
+          <h2>{{ employee.firstname }} {{ employee.middlename }} {{ employee.lastname }}</h2>
+            <samp>(Department - <strong>{{ employee.department_id }}</strong> and Designation -<strong> {{ employee.position_id }}</strong>)</samp>
+          <p class="mb-0">Here's a quick overview of your HR information</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="dashboard">
+      <div class="card">
+        <div class="icon"><i class="fa-solid fa-calendar-day"></i></div>
+        <div><h3> Leave Balance </h3> {{leave_balance}} days </div>
+        <h3>Monthly Leaves Availed</h3>
+        <div class="leave-breakdown mt-3">
+            <div class="row g-2">
+                <!-- Define months in order -->
+                {% with 'april,may,june,july,august,september,october,november,december,january,february,march' as months_list %}
+                    {% for month in months_list|split:"," %}
+                        <!-- Get count from leaves_availed dict -->
+                        {% with leaves_availed|get_item:month as count %}
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <div class="leave-card d-flex align-items-center p-2 rounded-3">
+                                    <div class="month-badge me-2" style="
+                                        width: 30px;
+                                        height: 30px;
+                                        background: {% if count > 1 %}#e74c3c{% elif count == 1 %}#f39c12{% else %}#2ecc71{% endif %};
+                                        border-radius: 8px;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: bold;
+                                        font-size: 0.8rem;">
+                                        {{ count|default:0 }}
+                                    </div>
+                                    <div class="month-name text-capitalize">{{ month }}</div>
+                                </div>
+                            </div>
+                        {% endwith %}
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick Actions</h3>
+        {% for employee in employees %}
+          <div class="quick-actions">
+            <button class="action-btn" title="Apply for Leave" data-id="{{ employee.pk }}">
+              <i class="fa-solid fa-calendar-plus"></i>
+              <span>Apply for Leave</span>
+            </button>
+            <button class="action-btn" title="View Payslip" data-id="{{ employee.pk }}">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+              <span>View Payslip</span>
+            </button>
+            <button class="action-btn exit-emp-data" title="Request Document" data-id="{{ employee.pk }}">
+              <i class="fa-solid fa-file-upload"></i>
+              <span>Request Document</span>
+            </button>
+            <button class="action-btn view-emp-data" title="View Information" data-id="{{ employee.pk }}">
+              <i class="fa-solid fa-user-edit"></i>
+              <span>Employee Information</span>
+            </button>
+            <button class="action-btn emp-asset-details" title="View Asset Details" data-id="{{ employee.pk }}">
+              <i class="fa-solid fa-cart-flatbed"></i>
+              <span>Asset Details</span>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+
+
+    </div>
+    <div class="container-fluid px-3">
+        <div class="card holiday-card mx-auto mb-4" style="max-width: 800px;">
+            <div class="card-header bg-white border-0 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon me-3"><i class="fa-solid fa-calendar-day"></i></div>
+                    <h3 class="mb-0">Holiday's List</h3>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_pdf %}
+                    <div class="pdf-container position-relative">
+                        <iframe
+                            src="{% url 'serve_pdf' latest_pdf.id %}"
+                            class="w-100"
+                            style="height: 450px; border-radius: 8px; border: none;"
+                            allowfullscreen>
+                        </iframe>
+                        <div class="pdf-overlay d-flex align-items-center justify-content-center">
+                            <i class="fa-solid fa-file-pdf fa-3x text-primary"></i>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
+                        <p class="fs-5 text-muted mb-0">No holiday schedule available at the moment</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="mdc-layout-grid">
+            <div class="mdc-layout-grid__inner">
+                <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop">
+                    <span class="text-center text-sm-left d-block d-sm-inline-block tx-14">Created By NITIN ADHIKARI</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+  </div>
+
+  <!-- Asset Details Modal -->
+  <div class="modal fade modal-same-size" id="assetModal" tabindex="-1" aria-labelledby="assetModalLabel"
+      aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="assetModalLabel">Manage Assets</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs mb-3" id="assetTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="table-tab" data-bs-toggle="tab" href="#table" role="tab"
+                  aria-controls="table" aria-selected="true">Issued Assets</a>
+              </li>
+            </ul>
+            <div class="tab-content" id="assetTabContent">
+              <div class="tab-pane fade show active" id="table" role="tabpanel" aria-labelledby="table-tab">
+                <div class="scrollable-table">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th style="width: 10%;">S. No.</th>
+                        <th style="width: 20%;">Asset Name</th>
+                        <th style="width: 15%;">Sr. Number</th>
+                        <th style="width: 15%;">Asset Code</th>
+                        <th style="width: 15%;">Issue Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="assetsTableBody">
+                      <!-- Dynamically populated -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- Exit Details Modal -->
+  <div class="modal fade" id="exitModal" tabindex="-1" aria-labelledby="exitModalLabel" aria-hidden="true"
+      data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exitModalLabel">Exit Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="exitForm" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="employee_id" value="" />
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="reason" class="form-label">Exit Reason</label>
+                  <select name="reason" disabled id="reason" class="form-select form-select-sm" required>
+                    <option value="">Select Reason</option>
+                    <option value="Resignation">Resignation</option>
+                    <option value="Termination">Termination</option>
+                    <option value="Absconding">Absconding</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="clearance_form" class="form-label">Clearance Form</label>
+                  <input type="file" name="clearance_form" class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                    disabled />
+                  <small id="clearance_form_display" class="text-muted"></small>
+                </div>
+                <div class="col-md-4">
+                  <label for="experience_letter" class="form-label">Experience Letter</label>
+                  <input type="file" name="experience_letter" class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                    disabled />
+                  <small id="experience_letter_display" class="text-muted"></small>
+                </div>
+              </div>
+              <div class="row mt-3 g-3">
+                <div class="col-md-4">
+                  <label for="relieving_letter" class="form-label">Relieving Letter</label>
+                  <input type="file" name="relieving_letter" class="form-control form-control-sm" accept=".pdf,.doc,.docx"
+                    disabled />
+                  <small id="relieving_letter_display" class="text-muted"></small>
+                </div>
+              </div>
+              <div class="mt-4">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="clearance_chk_bx" id="clearance_chk_bx" disabled />
+                  <label class="form-check-label" for="clearance_chk_bx">Clearance Form</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="asset_handover" id="asset_handover" disabled />
+                  <label class="form-check-label" for="asset_handover">Asset Handover Completed</label>
+                </div>
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" name="no_dues_submission" id="no_dues_submission"
+                    disabled />
+                  <label class="form-check-label" for="no_dues_submission">No Dues Submission Completed</label>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div class="modal fade" id="uni_modal" role='dialog'>
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-flat btn-primary rounded-0" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const currentPage = window.location.pathname;
+          const links = document.querySelectorAll('.mdc-drawer-link');
+
+          links.forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+              const parentItem = link.closest('.mdc-list-item');
+
+              // Add MDC selected class
+              parentItem.classList.add('mdc-list-item--selected');
+              parentItem.setAttribute('aria-selected', 'true');
+
+              // Get icon (inside .mdc-list-item__start-detail or same level)
+              const icon = link.querySelector('.mdc-list-item__start-detail');
+              if (icon) icon.style.color = 'black';
+
+              // Optional: change text color too
+              link.style.color = 'black';
+            }
+          });
+        });
+
+
+        window.start_loader = function() {
+            $('body').removeClass('loaded')
+        }
+        window.end_loader = function() {
+            $('body').addClass('loaded')
+        }
+        window.uni_modal = function($title = '', $url = '', $size = "") {
+            start_loader()
+            $.ajax({
+                url: $url,
+                error: err => {
+                    console.log()
+                    alert("An error occured")
+                },
+                success: function(resp) {
+                    if (resp) {
+                        $('#uni_modal .modal-title').html($title)
+                        $('#uni_modal .modal-body').html(resp)
+                        if ($size != '') {
+                            $('#uni_modal .modal-dialog').addClass($size + '  modal-dialog-centered')
+                        } else {
+                            $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-md modal-dialog-centered")
+                        }
+                        $('#uni_modal').modal({
+                            backdrop: 'static',
+                            keyboard: false,
+                            focus: true
+                        })
+                        $('#uni_modal').modal('show')
+                        end_loader()
+                    }
+                }
+            })
+        }
+        window._conf = function($msg = '', $func = '', $params = []) {
+            $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
+            $('#confirm_modal .modal-body').html($msg)
+            $('#confirm_modal').modal('show')
+        }
+
+    </script>
+
+  <script>
+    // Tooltip functionality using title attribute
+    document.querySelectorAll('[title]').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const title = btn.getAttribute('title');
+        btn.setAttribute('data-tooltip', title);
+        btn.removeAttribute('title');
+      });
+      btn.addEventListener('mouseleave', () => {
+        const tooltip = btn.getAttribute('data-tooltip');
+        btn.setAttribute('title', tooltip);
+        btn.removeAttribute('data-tooltip');
+      });
+    });
+
+    // Active link highlighting
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentPage = window.location.pathname;
+      const links = document.querySelectorAll('.nav-link');
+      links.forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('active');
+          link.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+        }
+      });
+    });
+  </script>
+
+<!--  EMP Details-->
+  <script>
+    $(function () {
+      $('.view-emp-data').click(function () {
+        uni_modal("Employee Details", "{% url 'employee-details-page' %}?id=" + $(this).attr('data-id'), 'modal-lg');
+      });
+    });
+  </script>
+
+<!--  ASSET -->
+  <script>
+    $(function () {
+      let currentAssetId = null;
+      $('.emp-asset-details').click(function () {
+        const employeeId = $(this).attr('data-id');
+        $('#assetModal input[name="employee_id"]').val(employeeId);
+        load_assets(employeeId);
+        $('#assetModal').modal('show');
+      });
+
+      function load_assets(employeeId) {
+        $.ajax({
+          url: "{% url 'load_assets' %}",
+          type: 'GET',
+          data: { employee_id: employeeId },
+          success: function (response) {
+            if (response.status === 'success') {
+              const assets = response.assets;
+              const tbody = $('#assetsTableBody');
+              tbody.empty();
+              var i = 1;
+              if (assets.length > 0) {
+                assets.forEach(asset => {
+                  tbody.append(`
+                    <tr>
+                      <td>${i++}</td>
+                      <td>${asset.name}</td>
+                      <td>${asset.serial_number}</td>
+                      <td>${asset.asset_code}</td>
+                      <td>${asset.issue_date}</td>
+                    </tr>
+                  `);
+                });
+              } else {
+                tbody.append('<tr><td colspan="5" class="text-center">No assets available.</td></tr>');
+              }
+            } else {
+              alert('Error loading assets.');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error:', error);
+            alert('An error occurred while loading assets.');
+          },
+        });
+      }
+    });
+  </script>
+
+<!--  EXIT -->
+  <script>
+    $(function () {
+      $('.exit-emp-data').on('click', function () {
+        const employeeId = $(this).attr('data-id');
+        $('#exitForm input[name="employee_id"]').val(employeeId);
+        load_exit_details(employeeId);
+        $('#exitModal').modal('show');
+      });
+
+      function load_exit_details(employeeId) {
+        $.ajax({
+          url: "{% url 'get_exit_details' %}",
+          type: 'GET',
+          data: { employee_id: employeeId },
+          success: function (response) {
+            if (response.status === 'success') {
+              const exitDetails = response.exit_details;
+              const media_url = 'media/';
+              $('#reason').val(exitDetails.reason);
+              $('#clearance_chk_bx').prop('checked', exitDetails.clearance_chk);
+              $('#asset_handover').prop('checked', exitDetails.asset_handover);
+              $('#no_dues_submission').prop('checked', exitDetails.no_dues_submission);
+
+              if (exitDetails.clearance_form) {
+                $('#clearance_form_display').html(
+                  `<p>Current Clearance Form: <a href="${media_url + exitDetails.clearance_form}" target="_blank">View</a></p>`
+                );
+              } else {
+                $('#clearance_form_display').html('<p>No clearance form available.</p>');
+              }
+
+              if (exitDetails.experience_letter) {
+                $('#experience_letter_display').html(
+                  `<p>Current Experience Letter: <a href="${media_url + exitDetails.experience_letter}" target="_blank">View</a></p>`
+                );
+              } else {
+                $('#experience_letter_display').html('<p>No experience letter available.</p>');
+              }
+
+              if (exitDetails.relieving_letter) {
+                $('#relieving_letter_display').html(
+                  `<p>Current Relieving Letter: <a href="${media_url + exitDetails.relieving_letter}" target="_blank">View</a></p>`
+                );
+              } else {
+                $('#relieving_letter_display').html('<p>No relieving letter available.</p>');
+              }
+            } else {
+              console.log('No exit details found.');
+            }
+          },
+          error: function (xhr, status, error) {
+            console.error('Error:', error);
+            alert('An error occurred while loading exit details.');
+          },
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

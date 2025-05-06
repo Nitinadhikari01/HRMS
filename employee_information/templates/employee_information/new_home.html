@@ -1,0 +1,363 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% if page_title %}
+    <title>{{ page_title }} | HRIS </title>
+    {% else %}
+    <title>HRMS</title>
+    {% endif %}
+
+  <!-- Required CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Internal CSS -->
+  <style>
+    :root {
+      --primary-color: #5a321a;
+      --accent-color: #874000;
+      --text-color: #34495e;
+      --bg-color: #f8f9fa;
+      --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --hover-bg: #eaf2f8;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: 'Segoe UI', sans-serif;
+      margin-top: 70px;
+    }
+
+    /* Top Navigation */
+    .navbar {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: #fff !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-link {
+      color: #fff !important;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .dropdown-menu {
+      min-width: 180px;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--hover-bg);
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      margin-top: 80px;
+      padding: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+      border: none;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .icon {
+      width: 60px;
+      height: 60px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    h2, h3 {
+      color: var(--primary-color);
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .action-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      position: relative;
+    }
+
+    .action-btn:hover {
+      background: var(--accent-color);
+      transform: scale(1.1);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 0.85rem;
+      opacity: 0.9;
+      animation: fadeSlide 0.3s ease;
+      font-weight: 500;
+    }
+
+    @keyframes fadeSlide {
+      from { transform: translateX(-50%) translateY(10px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .quick-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .navbar-collapse {
+        background: var(--primary-color);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="/static/employee_information/assets/material-admin/images/enquest-logo-removebg-preview.png" alt="Logo" width="32" class="me-2">
+        HRIS
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-between" id="topNav">
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'home-page' %}">
+              <i class="material-icons md-18">home</i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'department-page' %}">
+              <i class="material-icons md-18">business</i> Department
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'designation-page' %}">
+              <i class="material-icons md-18">list</i> Designations
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'employee-page' %}">
+              <i class="material-icons md-18">group</i> Employee
+            </a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <img src="{% static 'employee_information/assets/material-admin/images/profile.jpg' %}" alt="User" class="rounded-circle me-2" width="32"> {{ user|upper }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'redirect-admin' %}">Admin</a></li>
+              <li><a class="dropdown-item" href="{% url 'logoutuser' %}">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+    {% block ScriptBlock %}
+    {% endblock ScriptBlock %}
+    <div class="modal fade" id="uni_modal" role='dialog'>
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-flat btn-primary rounded-0" id='submit' onclick="$('#uni_modal form').submit()">Save</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirm_modal" role='dialog'>
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmation</h5>
+                </div>
+                <div class="modal-body">
+                    <div id="delete_content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-flat btn-primary rounded-0" id='confirm' onclick="">Continue</button>
+                    <button type="button" class="btn btn-sm btn-flat btn-secondary rounded-0" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const currentPage = window.location.pathname;
+          const links = document.querySelectorAll('.mdc-drawer-link');
+
+          links.forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+              const parentItem = link.closest('.mdc-list-item');
+
+              // Add MDC selected class
+              parentItem.classList.add('mdc-list-item--selected');
+              parentItem.setAttribute('aria-selected', 'true');
+
+              // Get icon (inside .mdc-list-item__start-detail or same level)
+              const icon = link.querySelector('.mdc-list-item__start-detail');
+              if (icon) icon.style.color = 'black';
+
+              // Optional: change text color too
+              link.style.color = 'black';
+            }
+          });
+        });
+
+
+        window.start_loader = function() {
+            $('body').removeClass('loaded')
+        }
+        window.end_loader = function() {
+            $('body').addClass('loaded')
+        }
+        window.uni_modal = function($title = '', $url = '', $size = "") {
+            start_loader()
+            $.ajax({
+                url: $url,
+                error: err => {
+                    console.log()
+                    alert("An error occured")
+                },
+                success: function(resp) {
+                    if (resp) {
+                        $('#uni_modal .modal-title').html($title)
+                        $('#uni_modal .modal-body').html(resp)
+                        if ($size != '') {
+                            $('#uni_modal .modal-dialog').addClass($size + '  modal-dialog-centered')
+                        } else {
+                            $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-md modal-dialog-centered")
+                        }
+                        $('#uni_modal').modal({
+                            backdrop: 'static',
+                            keyboard: false,
+                            focus: true
+                        })
+                        $('#uni_modal').modal('show')
+                        end_loader()
+                    }
+                }
+            })
+        }
+        window._conf = function($msg = '', $func = '', $params = []) {
+            $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
+            $('#confirm_modal .modal-body').html($msg)
+            $('#confirm_modal').modal('show')
+        }
+
+    </script>
+<!--    <script src="{% static 'employee_information/assets/material-admin/vendors/js/vendor.bundle.base.js' %}"></script>-->
+<!--    <script src="{% static 'employee_information/assets/material-admin/js/material.js' %}"></script>-->
+<!--    <script src="{% static 'employee_information/assets/material-admin/js/misc.js' %}"></script>-->
+<!--    <script src="{% static 'employee_information/assets/material-admin/js/dashboard.js' %}"></script>-->
+<!--    <script src="{% static 'employee_information/assets/material-admin/js/preloader.js ' %}"></script>-->
+  <!-- Keep only one instance of each library -->
+<script src="{% static 'employee_information/assets/default/js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'employee_information/assets/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Tooltip functionality
+    document.querySelectorAll('[title]').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const title = btn.getAttribute('title');
+        btn.setAttribute('data-tooltip', title);
+        btn.removeAttribute('title');
+      });
+      btn.addEventListener('mouseleave', () => {
+        const tooltip = btn.getAttribute('data-tooltip');
+        btn.setAttribute('title', tooltip);
+        btn.removeAttribute('data-tooltip');
+      });
+    });
+
+    // Highlight active link
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentPage = window.location.pathname;
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('active');
+          link.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

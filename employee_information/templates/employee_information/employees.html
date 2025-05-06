@@ -1,0 +1,1178 @@
+{% extends "employee_information/base.html" %}
+{% block pageContent %}
+
+<style>
+    /* Hover Effects */
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Font Weight Light Underline */
+    .font-weight-light {
+      position: relative;
+      padding-bottom: 8px;
+    }
+    .font-weight-light::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+    .font-weight-light:hover::after {
+      transform: scaleX(1);
+    }
+
+    /* Button Hover */
+    .icon-button:hover {
+      transform: translateY(-1px);
+    }
+
+    #searchInput {
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ccc;
+        font-size: 0.9rem;
+    }
+    #searchInput:focus {
+        border-color: #80bdff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .table-wrapper {
+        max-height: 350px;
+        overflow-y: auto;
+        border-radius: 8px;
+    }
+
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #f5f7fb;
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Table Styling */
+    .table-striped.table-bordered {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+    }
+
+    .table tbody tr {
+        background-color: #fafbff;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #eeeeff;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 0.5rem;
+    }
+    .add-button {
+        font-size: 0.85rem;
+        border-radius: 6px;
+        background-color: #5a321a;
+        color: #fff;
+    }
+
+
+
+</style>
+
+<div class="container-fluid py-0">
+  <!-- Employee Header -->
+  <div class="row g-3 mb-3">
+    <div class="col-12">
+      <div class="card shadow-sm border-0 rounded-3 ">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center">
+          <h4 class="card-title mb-2 mb-sm-0">Employee List</h4>
+          <button class=" btn-sm  add-button" id="create_new">
+            <i class="material-icons align-middle me-1">add</i> Add New
+          </button>
+        </div>
+        <div class="card-footer bg-white pt-3">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search Employee by Name, DOJ, Designation, Department, or Code">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Table -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-0">
+          <div class="table-responsive table-wrapper">
+            <table class="table table-striped table-bordered align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center py-2">S.No.</th>
+                  <th class="text-center py-2">Emp Code</th>
+                  <th class="text-center py-2">Employee Name</th>
+                  <th class="text-center py-2">Department & Designation</th>
+                  <th class="text-center py-2">Asset Details</th>
+                  <th class="text-center py-2">Leave Status</th>
+                  <th class="text-center py-2">Status</th>
+                  <th class="text-center py-2">Actions</th>
+                  <th class="text-center py-2">Exit</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+                {% for employee in employees %}
+                <tr data-name="{{ employee.firstname|lower }} {{ employee.middlename|lower }} {{ employee.lastname|lower }}"
+                    data-code="{{ employee.emp_code }}"
+                    data-department="{{ employee.department_id }}"
+                    data-designation="{{ employee.position_id }}"
+                    data-doj="{{ employee.date_hired|date:'Y-m-d' }}">
+                  <td class="text-center">{{ forloop.counter }}</td>
+                  <td>{{ employee.emp_code }}</td>
+                  <td>{{ employee.firstname }} {{ employee.middlename }} {{ employee.lastname }}</td>
+                  <td>{{ employee.department_id }} - {{ employee.position_id }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-info asset-details" data-id="{{ employee.pk }}" title="Asset Details">
+                      <i class="material-icons fs-6">laptop</i>
+                    </button>
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary leave-details" data-id="{{ employee.pk }}" title="Leave Details">
+                      <i class="material-icons fs-6">event</i>
+                    </button>
+                  </td>
+                  <td class="text-center">
+                    {% if employee.status == 1 %}
+                    <span class="badge bg-primary rounded-pill">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary rounded-pill">Inactive</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary view-data" data-id="{{ employee.pk }}">
+                      <i class="material-icons fs-6">visibility</i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary edit-data" data-id="{{ employee.pk }}">
+                      <i class="material-icons fs-6">edit</i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger delete-data" data-id="{{ employee.pk }}">
+                      <i class="material-icons fs-6">delete_outline</i>
+                    </button>
+                  </td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-danger exit-emp" data-id="{{ employee.pk }}" title="Exit Details">
+                      <i class="material-icons fs-6">logout</i>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Leave Modal -->
+<!--<style>-->
+<!--    .leaveModal{-->
+<!--        z-index: 1100;-->
+<!--    }-->
+<!--</style>-->
+<!-- Leave Modal -->
+<div class="modal fade" id="leaveModal" tabindex="-1" aria-labelledby="leaveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <form id="leaveForm" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title">Leave Report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="employee_id" id="employee_id" />
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th rowspan="2">NAME OF EMPLOYEE</th>
+                <th rowspan="2">Leave Entitlement</th>
+                <th colspan="12" class="text-center">Leaves Availed</th>
+                <th rowspan="2">Leave Balance</th>
+              </tr>
+              <tr>
+                <th>April</th><th>May</th><th>June</th><th>July</th><th>August</th>
+                <th>September</th><th>October</th><th>November</th><th>December</th>
+                <th>January</th><th>February</th><th>March</th>
+              </tr>
+            </thead>
+            <tbody id="leaveTableBody">
+              <tr>
+                <td id="empName"></td>
+                <td><input type="text" id="entitlement" class="form-control form-control-sm" name="entitlement"></td>
+                <td><input type="text" id="april" class="form-control form-control-sm" name="april"></td>
+                <td><input type="text" id="may" class="form-control form-control-sm" name="may"></td>
+                <td><input type="text" id="june" class="form-control form-control-sm" name="june"></td>
+                <td><input type="text" id="july" class="form-control form-control-sm" name="july"></td>
+                <td><input type="text" id="august" class="form-control form-control-sm" name="august"></td>
+                <td><input type="text" id="september" class="form-control form-control-sm" name="september"></td>
+                <td><input type="text" id="october" class="form-control form-control-sm" name="october"></td>
+                <td><input type="text" id="november" class="form-control form-control-sm" name="november"></td>
+                <td><input type="text" id="december" class="form-control form-control-sm" name="december"></td>
+                <td><input type="text" id="january" class="form-control form-control-sm" name="january"></td>
+                <td><input type="text" id="february" class="form-control form-control-sm" name="february"></td>
+                <td><input type="text" id="march" class="form-control form-control-sm" name="march"></td>
+                <td><strong><input type="text" id="balance" class="form-control form-control-sm" readonly name="balance"></strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+<!-- Asset Details Modal -->
+<style>
+    /* Modal Styling */
+    #assetModal .modal-dialog {
+        max-width: 800px;
+        width: 100%;
+        margin: 1.5rem auto;
+        height: 650px;
+        max-height: 650px;
+        overflow-y: auto;
+    }
+
+    #assetModal .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        height: 100%;
+    }
+
+    #assetModal .modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #f8faff;
+        border-bottom: 1px solid #e3ebf6;
+    }
+
+    #assetModal .modal-title {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    #assetModal .modal-body {
+        padding: 1.5rem;
+        height: calc(100% - 100px);
+        background-color: #ffffff;
+    }
+
+    /* Form Typography */
+    h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    form label {
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #34495e;
+    }
+
+    form .form-control {
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.875rem;
+        border: 1px solid #ccc;
+    }
+
+    form .btn-primary {
+        padding: 0.4rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    form .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Tabs */
+    .nav-tabs .nav-link {
+        color: black ! important;
+        font-weight: 600;
+        color: #495057;
+        border-radius: 6px 6px 0 0;
+        transition: all 0.2s ease;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #007bff ! important;
+        background-color: #e9f0ff;
+        border-color: #007bff;
+        font-weight: 700;
+    }
+
+    /* Scrollable Table */
+    .scrollable-table {
+        max-height: 450px;
+        overflow-y: auto;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        background-color: #ffffff;
+    }
+
+    .scrollable-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .scrollable-table th,
+    .scrollable-table td {
+        padding: 10px 12px;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #2c3e50;
+    }
+
+    .scrollable-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #f1f5fa;
+        font-weight: 600;
+        border-bottom: 2px solid #e3ebf6;
+    }
+
+    .scrollable-table tbody tr:nth-child(even) {
+        background-color: #fafcff;
+    }
+
+    .scrollable-table tbody tr:hover {
+        background-color: #edf4ff;
+    }
+
+    /* Responsive Padding */
+    @media (max-width: 576px) {
+        .scrollable-table th,
+        .scrollable-table td {
+            font-size: 0.8rem;
+            padding: 8px;
+        }
+    }
+
+    /* Button Style Reference */
+    .icon-button {
+        padding: 6px !important;
+        min-width: auto !important;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .filled-button--danger {
+        background-color: #ffd8d8;
+        color: #d92525;
+    }
+
+    .filled-button--danger:hover {
+        background-color: #ffb8b8;
+        transform: translateY(-1px);
+    }
+</style>
+
+<!-- Asset Modal -->
+<div class="modal fade" id="assetModal" tabindex="-1" aria-labelledby="assetModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Assets</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs mb-3" id="assetTab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="table-tab" data-bs-toggle="tab" href="#table" role="tab">Issued Assets</a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="edit-tab" data-bs-toggle="tab" href="#edit" role="tab">Add/Edit Asset</a>
+          </li>
+        </ul>
+        <div class="tab-content" id="assetTabContent">
+          <!-- Issued Assets -->
+          <div class="tab-pane fade show active" id="table" role="tabpanel">
+            <div class="table-responsive scrollable-table">
+              <table class="table table-bordered align-middle">
+                <thead>
+                  <tr>
+                    <th>S. No.</th>
+                    <th>Asset Name</th>
+                    <th>Sr. Number</th>
+                    <th>Asset Code</th>
+                    <th>Issue Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="assetsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Add/Edit Asset -->
+          <div class="tab-pane fade" id="edit" role="tabpanel">
+            <form id="assetForm" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="employee_id" value="">
+              <input type="hidden" name="asset_id" value="">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="name" class="form-label">Asset Name</label>
+                  <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="serial_number" class="form-label">Serial Number</label>
+                  <input type="text" class="form-control" id="serial_number" name="serial_number" required>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="issue_date" class="form-label">Issue Date</label>
+                  <input type="date" class="form-control" id="issue_date" name="issue_date" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="asset_code" class="form-label">Asset Code</label>
+                  <input type="text" class="form-control" id="asset_code" name="asset_code" required>
+                </div>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary">Save Asset</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Exit Details Modal -->
+<style>
+    /* Modal Styling */
+    #exitModal .modal-dialog {
+        max-width: 800px;
+        width: 100%;
+        margin: 1.5rem auto;
+        height: 650px;
+        max-height: 650px;
+        overflow-y: auto;
+    }
+
+    #exitModal .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        height: 100%;
+    }
+
+    #exitModal .modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #f8faff;
+        border-bottom: 1px solid #e3ebf6;
+    }
+
+    #exitModal .modal-title {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    #exitModal .modal-body {
+        padding: 1.5rem;
+        background-color: #ffffff;
+        height: calc(100% - 100px);
+    }
+
+    /* Form Typography */
+    h4 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    form label {
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #34495e;
+    }
+
+    form .form-select,
+    form .form-control {
+        border-radius: 6px;
+        padding: 0.4rem 0.75rem;
+        font-size: 0.875rem;
+        border: 1px solid #ced4da;
+    }
+
+    form .btn-primary {
+        padding: 0.4rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: all 0.2s ease-in-out;
+    }
+
+    form .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.25);
+    }
+
+    /* Checkbox Style */
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+        margin-top: 0.25rem;
+        vertical-align: top;
+    }
+
+    .form-check-label {
+        margin-left: 0.5rem;
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+
+    .form-group.checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Responsive Padding */
+    @media (max-width: 768px) {
+        .col-md-4.mb-3 {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- Exit Modal -->
+<div class="modal fade" id="exitModal" tabindex="-1" aria-labelledby="exitModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Manage Exit Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="exitForm" method="post" enctype="multipart/form-data">
+          <input type="hidden" name="employee_id" value="">
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label for="reason" class="form-label">Exit Reason</label>
+              <select name="reason" id="reason" class="form-select" required>
+                <option value="">Select Reason</option>
+                <option value="Resignation">Resignation</option>
+                <option value="Termination">Termination</option>
+                <option value="Absconding">Absconding</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="clearance_form" class="form-label">Clearance Form</label>
+              <input type="file" name="clearance_form" id="clearance_form" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label for="experience_letter" class="form-label">Experience Letter</label>
+              <input type="file" name="experience_letter" id="experience_letter" class="form-control">
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label for="relieving_letter" class="form-label">Relieving Letter</label>
+              <input type="file" name="relieving_letter" id="relieving_letter" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label for="no_dues_form" class="form-label">No Dues Form</label>
+              <input type="file" name="no_dues_form" id="no_dues_form" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="clearance_chk_bx" id="clearance_chk_bx">
+              <label class="form-check-label" for="clearance_chk_bx">Clearance Form</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="asset_handover" id="asset_handover">
+              <label class="form-check-label" for="asset_handover">Asset Handover Completed</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="no_dues_submission" id="no_dues_submission">
+              <label class="form-check-label" for="no_dues_submission">No Dues Submission Completed</label>
+            </div>
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">Save Exit Details</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock pageContent %}
+{% block ScriptBlock %}
+
+
+<script>
+    $(function () {
+
+        $('#searchInput').on('input', function () {
+            const query = $(this).val().toLowerCase();
+
+            if(!query.trim()){
+                $('#employeeTableBody tr').show();
+                return;
+            }
+
+            $('#employeeTableBody tr').each(function () {
+                const name = $(this).data('name').toLowerCase();
+                const code = $(this).data('code').toLowerCase();
+                const department = $(this).data('department').toLowerCase();
+                const designation = $(this).data('designation').toLowerCase();
+                const doj = $(this).data('doj').toLowerCase();
+
+
+                if (
+                    name.includes(query) ||
+                    code.includes(query) ||
+                    department.includes(query) ||
+                    designation.includes(query) ||
+                    doj.includes(query)
+                ) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        $('#create_new').click(function() {
+            uni_modal("Add New Employee", "{% url 'manage_employees-page' %}", 'modal-lg')
+        })
+        $('.view-data').click(function() {
+            uni_modal("Employee Details", "{% url 'view-employee-page' %}?id=" + $(this).attr('data-id'), 'modal-lg')
+        })
+        $('.edit-data').click(function() {
+            uni_modal("Edit Employee", "{% url 'manage_employees-page' %}?id=" + $(this).attr('data-id'), 'modal-lg')
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this employee?", "delete_employee", [$(this).attr('data-id')])
+        })
+    });
+
+    function delete_employee($id) {
+        start_loader();
+        $.ajax({
+            headers: {
+                "X-CSRFToken": '{{csrf_token}}'
+            },
+            url: "{% url 'delete-employee' %}",
+            method: "POST",
+            data: {
+                id: $id
+            },
+            dataType: "json",
+            error: err => {
+                console.log(err)
+                alert_toast("An error occured.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    alert(resp.msg)
+                    location.reload();
+                } else {
+                    alert_toast("An error occured.", 'error');
+                    end_loader();
+                }
+            }
+        })
+    }
+</script>
+
+
+<script>
+$(function () {
+    $('.leave-details').click(function () {
+        const employeeId = $(this).attr('data-id');
+        $('#leaveModal input[name="employee_id"]').val(employeeId);
+        load_leave_data(employeeId);
+        $('#leaveModal').modal('show');
+        const fullName = $(this).attr('data-name');
+        $('#empName').text(fullName);
+    });
+
+    function load_leave_data(employeeId) {
+        $.ajax({
+            url: "{% url 'get_leave_details' %}",
+            type: 'GET',
+            data: { employee_id: employeeId },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#empName').text(response.full_name);
+                    $('#entitlement').val(response.leave_entitlement);
+
+                    $('#april').val(response.leaves_availed.april || 0);
+                    $('#may').val(response.leaves_availed.may || 0);
+                    $('#june').val(response.leaves_availed.june || 0);
+                    $('#july').val(response.leaves_availed.july || 0);
+                    $('#august').val(response.leaves_availed.august || 0);
+                    $('#september').val(response.leaves_availed.september || 0);
+                    $('#october').val(response.leaves_availed.october || 0);
+                    $('#november').val(response.leaves_availed.november || 0);
+                    $('#december').val(response.leaves_availed.december || 0);
+                    $('#january').val(response.leaves_availed.january || 0);
+                    $('#february').val(response.leaves_availed.february || 0);
+                    $('#march').val(response.leaves_availed.march || 0);
+                    $('#balance').val(response.leave_balance)
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('An error occurred while loading leave data.');
+            }
+        });
+    }
+
+    function save_leave(employeeId) {
+        const formData = new FormData($('#leaveForm')[0]);
+        formData.append('employee_id', employeeId);
+
+        formData.append('leave_entitlement', $('#entitlement').val());
+        formData.append('april', $('#april').val());
+        formData.append('may', $('#may').val());
+        formData.append('june', $('#june').val());
+        formData.append('july', $('#july').val());
+        formData.append('august', $('#august').val());
+        formData.append('september', $('#september').val());
+        formData.append('october', $('#october').val());
+        formData.append('november', $('#november').val());
+        formData.append('december', $('#december').val());
+        formData.append('january', $('#january').val());
+        formData.append('february', $('#february').val());
+        formData.append('march', $('#march').val());
+
+        $.ajax({
+            url: "{% url 'save_leave' %}",
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#balance').val(response.leave_balance)
+                     $('#leaveModal').modal('hide');
+                    alert('Leave data saved successfully!');
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Save Error:', error);
+                alert('An error occurred while saving the leave data.');
+            }
+        });
+    }
+
+    $('#leaveForm').on('submit', function(e) {
+        e.preventDefault();
+        const employeeId = $('#leaveModal input[name="employee_id"]').val();
+        save_leave(employeeId);
+    });
+
+
+});
+</script>
+
+
+
+<script>
+    $(function () {
+        let currentAssetId = null;
+
+        $('.asset-details').click(function () {
+            const employeeId = $(this).attr('data-id');
+            $('#assetModal input[name="employee_id"]').val(employeeId);
+            load_assets(employeeId);
+            reset_asset_modal();
+            $('#assetModal').modal('show');
+            $('[href="#table"]').tab('show');
+        });
+
+        function reset_asset_modal() {
+            $('#assetForm')[0].reset();
+            $('#assetForm input[name="asset_id"]').val('');
+            currentAssetId = null;
+        }
+
+
+        function load_assets(employeeId) {
+            $.ajax({
+                url: "{% url 'load_assets' %}",
+                type: 'GET',
+                data: { employee_id: employeeId },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const assets = response.assets;
+                        const tbody = $('#assetsTableBody');
+                        tbody.empty();
+                        var i = 1;
+                        if (assets.length > 0) {
+                            assets.forEach(asset => {
+                                tbody.append(`
+                                    <tr>
+                                        <td>`+ (i) +`</td>>
+                                        <td>${asset.name}</td>
+                                        <td>${asset.serial_number}</td>
+                                        <td>${asset.asset_code}</td>
+                                        <td>${asset.issue_date}</td>
+
+                                        <td>
+                                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--light mdc-ripple-upgraded edit-asset" type="button" data-id="${asset.id}" title="Edit">
+                                                <i class="material-icons mdc-button__icon">edit</i>
+                                            </button>
+                                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--danger mdc-ripple-upgraded delete-asset" type="button" data-id="${asset.id}" title="Delete">
+                                                <i class="material-icons mdc-button__icon">delete</i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `);
+                                i++;
+                            });
+                        } else {
+                            tbody.append('<tr><td colspan="5" class="text-center">No assets available.</td></tr>');
+                        }
+
+
+                        $('.edit-asset').off('click').on('click', function () {
+                            const assetId = $(this).attr('data-id');
+                            load_asset_for_edit(assetId);
+                        });
+
+                        $('.delete-asset').off('click').on('click', function () {
+                            const assetId = $(this).attr('data-id');
+                            delete_asset(assetId);
+                        });
+                    } else {
+                        alert('Error loading assets.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading assets.');
+                },
+            });
+        }
+
+
+        function load_asset_for_edit(assetId) {
+            $.ajax({
+                url: "{% url 'get_asset_details' %}",
+                type: 'GET',
+                data: { asset_id: assetId },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const asset = response.asset;
+
+                        $('#assetForm input[name="asset_id"]').val(asset.id);
+                        $('#assetForm input[name="name"]').val(asset.name);
+                        $('#assetForm input[name="serial_number"]').val(asset.serial_number);
+                        $('#assetForm input[name="issue_date"]').val(asset.issue_date);
+                        $('#assetForm input[name="asset_code"]').val(asset.asset_code);
+                        $('[href="#edit"]').tab('show');
+
+                        currentAssetId = asset.id;
+                    } else {
+                        alert('Error loading asset details.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading asset details.');
+                },
+            });
+        }
+
+
+        function delete_asset(assetId) {
+            if (confirm('Are you sure you want to delete this asset?')) {
+                $.ajax({
+                    url: "{% url 'delete_asset' %}",
+                    type: 'POST',
+                    data: { asset_id: assetId },
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+
+                            const employeeId = $('#assetModal input[name="employee_id"]').val();
+                            load_assets(employeeId);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the asset.');
+                    },
+                });
+            }
+        }
+
+        function save_asset(employeeId) {
+            const formData = new FormData($('#assetForm')[0]);
+
+            $.ajax({
+                url: "{% url 'save_asset' %}",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+
+                        load_assets(employeeId);
+
+                        $('#assetForm')[0].reset();
+                        $('#assetForm input[name="asset_id"]').val('');
+                        currentAssetId = null;
+                        $('[href="#table"]').tab('show');
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the asset.');
+                },
+            });
+        }
+
+        $('#assetForm').on('submit', function (e) {
+            e.preventDefault();
+            const employeeId = $('#assetForm input[name="employee_id"]').val();
+            save_asset(employeeId);
+        });
+    });
+</script>
+
+<script>
+    $(function () {
+        function validateFile(input, maxSizeMB, allowedTypes, fieldName) {
+            const file = input.files[0];
+            if (!file) return true;
+            const maxSizeBytes = maxSizeMB * 1024 * 1024;
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+
+            if (file.size > maxSizeBytes) {
+                alert(`${fieldName} file size exceeds ${maxSizeMB}MB.`);
+                input.value = '';
+                return false;
+            }
+
+            let isValidType = false;
+            for (const type of allowedTypes) {
+                if (fileType === type || fileName.endsWith(type)) {
+                    isValidType = true;
+                    break;
+                }
+            }
+            if (!isValidType) {
+                alert(`Invalid file type for ${fieldName}. Only ${allowedTypes.join(', ')} files are allowed.`);
+                input.value = '';
+                return false;
+            }
+            return true;
+        }
+
+        $('.exit-emp').on('click', function () {
+            const employeeId = $(this).attr('data-id');
+
+            $('#exitForm input[name="employee_id"]').val(employeeId);
+
+            reset_exit_modal();
+
+            load_exit_details(employeeId);
+
+            $('#delete_exitForm').val(employeeId);
+
+            $('#exitModal').modal('show');
+        });
+
+
+        function reset_exit_modal() {
+
+            const selectElement = document.getElementById('reason');
+            selectElement.value = 'options';
+
+            $('#clearance_form_display').empty();
+            $('#experience_letter_display').empty();
+            $('#relieving_letter_display').empty();
+            $('#no_dues_form_display').empty();
+
+            $('#asset_handover').prop('checked', false);
+            $('#no_dues_submission').prop('checked', false);
+            $('#clearance_chk_bx').prop('checked', false);
+        }
+
+
+        function load_exit_details(employeeId) {
+            $.ajax({
+                url: "{% url 'get_exit_details' %}",
+                type: 'GET',
+                data: { employee_id: employeeId },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const exitDetails = response.exit_details;
+
+                        media_url = 'media/'
+
+                        $('#reason').val(exitDetails.reason);
+                        $('#clearance_chk_bx').prop('checked', exitDetails.clearance_chk);
+                        $('#asset_handover').prop('checked', exitDetails.asset_handover);
+                        $('#no_dues_submission').prop('checked', exitDetails.no_dues_submission);
+
+                        if (exitDetails.clearance_form) {
+                            $('#clearance_form_display').html(
+                                `<p>Current Clearance Form: <a href="${media_url + exitDetails.clearance_form}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#clearance_form_display').html('<p>No clearance form available.</p>');
+                        }
+                        if (exitDetails.experience_letter) {
+                            $('#experience_letter_display').html(
+                                `<p>Current Experience Letter: <a href="${media_url + exitDetails.experience_letter}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#experience_letter_display').html('<p>No experience letter available.</p>');
+                        }
+                        if (exitDetails.relieving_letter) {
+                            $('#relieving_letter_display').html(
+                                `<p>Current Relieving Letter: <a href="${media_url + exitDetails.relieving_letter}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#relieving_letter_display').html('<p>No relieving letter available.</p>');
+                        }
+                        if (exitDetails.no_dues_form) {
+                            $('#no_dues_form_display').html(
+                                `<p>Current No Dues Form: <a href="${media_url + exitDetails.no_dues_form}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#no_dues_form_display').html('<p>No No Dues Form available.</p>');
+                        }
+
+                    } else {
+                        console.log('No exit details found.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading exit details.');
+                },
+            });
+        }
+
+        $('#exitForm').on('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const clearance_form = document.getElementById('clearance_form');
+            if (!validateFile(clearance_form, 20, ['.pdf', '.doc', '.docx'], 'Clearance Form')) {
+                return;
+            }
+
+            const experience_letter = document.getElementById('experience_letter');
+            if (!validateFile(experience_letter, 20, ['.pdf', '.doc', '.docx'], 'Experience Letter')) {
+                return;
+            }
+
+            const relieving_letter = document.getElementById('relieving_letter');
+            if (!validateFile(relieving_letter, 20, ['.pdf', '.doc', '.docx'], 'Relieving Letter')) {
+                return;
+            }
+
+            const no_dues_form = document.getElementById('no_dues_form');
+            if (!validateFile(no_dues_form, 20, ['.pdf', '.doc', '.docx'], 'No Dues Form')) {
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'save_exit_details' %}",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        $('#exitModal').modal('hide');
+                        reset_exit_modal();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the exit details.');
+                },
+            });
+        });
+    });
+</script>
+
+
+
+
+{% endblock ScriptBlock %}

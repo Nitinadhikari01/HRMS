@@ -1,0 +1,59 @@
+/* Ensure full viewport height and width */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Loader wrapper should adapt to viewport size */
+.loader-wrapper {
+    background: #e9eaefa6 !important;
+    height: 100%; /* Full height on any device */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Mid-large class - Adjust for smaller screens */
+.mid-large {
+    width: 54vw !important; /* Default width for larger screens */
+    max-width: unset;
+    margin: 0 auto;
+}
+
+@media only screen and (max-width: 767px) {
+    /* For mobile screens (width <= 767px) */
+    .mid-large {
+        width: 80vw !important; /* Increase width on small screens */
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    /* For tablets and medium devices (width between 768px and 1024px) */
+    .mid-large {
+        width: 70vw !important; /* Adjust width for tablets */
+    }
+}
+
+/* Content wrapper height adjustment */
+.body-wrapper .main-wrapper .page-wrapper .content-wrapper {
+    min-height: calc(100vh - 84px - 62px) !important;
+    padding: 20px; /* Added padding for better layout */
+    box-sizing: border-box; /* Ensures padding does not affect the height */
+}
+
+/* For extra large screens (large desktops) */
+@media only screen and (min-width: 1200px) {
+    .mid-large {
+        width: 50vw !important; /* Decrease the width on large screens */
+    }
+}
+
+/* Optional: Make content wrapper scrollable on mobile if necessary */
+@media only screen and (max-width: 767px) {
+    .body-wrapper .main-wrapper .page-wrapper .content-wrapper {
+        min-height: auto !important; /* Allow content to scroll */
+        height: auto;
+    }
+}

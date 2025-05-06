@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAF|EIS</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #eef2f3, #8e9eab);
+            min-height: 75vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 1000px;
+            width: 95%;
+            padding: 20px 30px;
+            box-sizing: border-box;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo {
+            width: 80px;
+            float: right;
+            margin-top: -40px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-top: 0;
+            letter-spacing: 0.5px;
+        }
+
+        form {
+            margin-top: 10px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .col {
+            flex: 1 1 calc(33.33% - 10px); /* 3 columns */
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .col.full {
+            flex: 1 1 100%; /* Full width column */
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="date"],
+        textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        section h2 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .col {
+                flex: 1 1 100%; /* Full width on small screens */
+            }
+        }
+        .logo {
+            width: 100px;
+            float: right;
+            margin-top: -20px;
+            display: block; /* Ensure it's displayed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/static/employee_information/assets/material-admin/images/enquest-logo-removebg-preview.png" alt="EnQuest Logo" class="logo">
+            <h2>Leave Application Form</h2>
+        </header>
+        <form id="leaveForm">
+            <!-- Personal Details Section -->
+            <section class="details-section">
+                <div class="row">
+                    <div class="col">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="col">
+                        <label for="employeeCode">Employee Code:</label>
+                        <input type="text" id="employeeCode" name="employeeCode" required>
+                    </div>
+                    <div class="col">
+                        <label for="department">Department:</label>
+                        <input type="text" id="department" name="department" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="designation">Designation:</label>
+                        <input type="text" id="designation" name="designation" required>
+                    </div>
+                    <div class="col">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" name="location" value="New Delhi" readonly>
+                    </div>
+                    <div class="col">
+                        <label for="year">Year:</label>
+                        <input type="number" id="year" name="year" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leave Details Section -->
+            <section class="leave-details-section">
+                <div class="row">
+                    <div class="col full">
+                        <label for="leaveAppliedFor">Leave Applied For:</label>
+                        <input type="text" id="leaveAppliedFor" name="leaveAppliedFor" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="noOfDays">No. of Days:</label>
+                        <input type="number" id="noOfDays" name="noOfDays" required>
+                    </div>
+                    <div class="col">
+                        <label for="natureOfLeave">Nature of Leave:</label>
+                        <input type="text" id="natureOfLeave" name="natureOfLeave" required>
+                    </div>
+                    <div class="col">
+                        <label for="reasonForLeave">Reason for Leave:</label>
+                        <textarea id="reasonForLeave" name="reasonForLeave" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col full">
+                        <label for="addressOutstation">Address, if proceeding outstation:</label>
+                        <textarea id="addressOutstation" name="addressOutstation" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="contactNo">Contact No.:</label>
+                        <input type="tel" id="contactNo" name="contactNo" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Signatures Section -->
+            <section class="signatures-section">
+                <div class="row">
+                    <div class="col">
+                        <label for="signatureApplicant">Signature of Applicant:</label>
+                        <input type="text" id="signatureApplicant" name="signatureApplicant" placeholder="Sign here">
+                    </div>
+                    <div class="col">
+                        <label for="sanctionedStatus">Sanctioned / Not Sanctioned</label>
+                        <input type="text" id="sanctionedStatus" name="sanctionedStatus" placeholder="Head of Department">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Employee Records Section -->
+            <section class="employee-records-section">
+                <h2>EMPLOYEE'S RECORDS (To be filled by HR)</h2>
+                <div class="row">
+                    <div class="col">
+                        <label for="hrName">Name:</label>
+                        <input type="text" id="hrName" name="hrName">
+                    </div>
+                    <div class="col">
+                        <label for="leaveFrom">Leave From:</label>
+                        <input type="date" id="leaveFrom" name="leaveFrom">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label for="natureOfLeaveHR">Nature of Leave:</label>
+                        <input type="text" id="natureOfLeaveHR" name="natureOfLeaveHR">
+                    </div>
+                    <div class="col">
+                        <label for="sanctionedStatusHR">Sanctioned / Not Sanctioned</label>
+                        <input type="text" id="sanctionedStatusHR" name="sanctionedStatusHR" placeholder="Head of Department">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submit Button -->
+            <button type="submit">Submit</button>
+        </form>
+
+        <!-- Footer -->
+        <footer>
+            <p>EnQuest Petrochemicals Private Limited<br>
+               CIN: U52109DL2007PTC127463<br>
+               Registered Office: 621, DLF Tower B, Jasola District Centre, Delhi - 110043<br>
+               Ph: +91-011-41055051/52/53, Fax: +91-011-41055054<br>
+               Website: www.enquest.co.in, email: info@enquest.co.in
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('leaveForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const requiredFields = document.querySelectorAll('[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'red';
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+
+            if (isValid) {
+                alert('Form submitted successfully!');
+                this.submit(); // Submit the form
+            } else {
+                alert('Please fill all required fields.');
+            }
+        });
+    </script>
+</body>
+</html>

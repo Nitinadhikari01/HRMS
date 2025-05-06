@@ -1,0 +1,223 @@
+{% extends "employee_information/base.html" %}
+{% block pageContent %}
+
+<style>
+    /* Card Styling */
+    .mdc-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+        padding: 8px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .mdc-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Header Section */
+    .card-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #2a2a2a;
+    }
+
+    .add-button {
+        font-size: 0.85rem;
+        border-radius: 6px;
+        background-color: #e0e7ff;
+        color: #375dfb;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .add-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table Wrapper - Scrollable */
+    .table-wrapper {
+        max-height: 350px;
+        overflow-y: auto;
+        border-radius: 8px;
+    }
+
+    /* Sticky Table Header */
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: #f5f7fb;
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    /* Table Styling */
+    .table-striped.table-bordered {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+    }
+
+    .table tbody tr {
+        background-color: #fafbff;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: background-color 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #eeeeff;
+    }
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 0.5rem;
+    }
+
+    /* Action Buttons */
+    .icon-button {
+        padding: 6px !important;
+        min-width: auto !important;
+        width: 36px;
+        height: 36px;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .filled-button--light {
+        background-color: #e0e7ff;
+        color: #375dfb;
+    }
+
+    .filled-button--light:hover {
+        background-color: #c9d8fd;
+        transform: translateY(-1px);
+    }
+
+    .filled-button--danger {
+        background-color: #ffd8d8;
+        color: #d92525;
+    }
+
+    .filled-button--danger:hover {
+        background-color: #ffb8b8;
+        transform: translateY(-1px);
+    }
+
+    /* Responsive Padding */
+    @media (max-width: 576px) {
+        .table thead th,
+        .table tbody td {
+            font-size: 0.85rem;
+            z-index: 0;
+        }
+    }
+</style>
+
+<!-- Department List Card -->
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Department List</h4>
+            <button class="mdc-button mdc-button--raised add-button btn-sm" id="create_new">
+                <i class="material-icons mdc-button__icon">add</i><span> Add New</span>
+            </button>
+        </div>
+    </div>
+</div>
+<br><br>
+
+<!-- Scrollable Table Card -->
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="table-wrapper">
+            <table class="table table-striped table-bordered">
+                <colgroup>
+                    <col width="10%">
+                    <col width="30%">
+                    <col width="35%">
+                    <col width="25%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="text-center py-1">S.No.</th>
+                        <th class="text-center py-1">Department Name</th>
+                        <th class="text-center py-1">Head of Department</th>
+                        <th class="text-center py-1">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                    <tr>
+                        <td class="px-2 py-1 text-center">{{ forloop.counter }}</td>
+                        <td class="px-2 py-1 text-start">{{ department.name }}</td>
+                        <td class="px-2 py-1 text-start">{{ department.hod }}</td>
+                        <td class="px-2 py-1 text-center">
+                            <button class="mdc-button mdc-button--raised icon-button filled-button--light edit-data"
+                                    type="button" data-id="{{ department.pk }}" title="Edit">
+                                <i class="material-icons mdc-button__icon">edit</i>
+                            </button>
+                            <button class="mdc-button mdc-button--raised icon-button filled-button--danger delete-data"
+                                    type="button" data-id="{{ department.pk }}" title="Delete">
+                                <i class="material-icons mdc-button__icon">delete_outline</i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock pageContent %}
+{% block ScriptBlock %}
+
+<script>
+    $(function() {
+        $('#create_new').click(function() {
+            uni_modal("Add New Department", "{% url 'manage_departments-page' %}")
+        })
+        $('.edit-data').click(function() {
+            uni_modal("Edit Department", "{% url 'manage_departments-page' %}?id=" + $(this).attr('data-id'))
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this department?", "delete_department", [$(this).attr('data-id')])
+        })
+    })
+
+    function delete_department($id) {
+        start_loader();
+        $.ajax({
+            headers: {
+                "X-CSRFToken": '{{csrf_token}}'
+            },
+            url: "{% url 'delete-department' %}",
+            method: "POST",
+            data: {
+                id: $id
+            },
+            dataType: "json",
+            error: err => {
+                console.log(err)
+                alert_toast("An error occured.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    location.reload();
+                } else {
+                    alert_toast("An error occured.", 'error');
+                    end_loader();
+                }
+            }
+        })
+    }
+</script>
+
+{% endblock ScriptBlock %}

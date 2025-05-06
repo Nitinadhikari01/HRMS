@@ -1,0 +1,220 @@
+{% extends "employee_information/base.html" %}
+{% block pageContent %}
+<style>
+    /* Card Styling */
+    .mdc-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background: #ffffff;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 8px;
+    }
+
+    .mdc-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Table Container with Scroll */
+    .table-wrapper {
+        max-height: 350px;
+        overflow-y: auto;
+        border-radius: 8px;
+    }
+
+    /* Optional Scrollbar Styling (WebKit only) */
+    .table-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Sticky Header */
+    .table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 100; /* Higher to stay above rows */
+        background-color: #f5f7fb;
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Table Styling */
+    .table-striped.table-bordered {
+        border-collapse: separate;
+        border-spacing: 0 8px;
+        width: 100%;
+    }
+
+    .table tbody tr {
+        background-color: #fafbff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table tbody tr td {
+        vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+        background-color: #eeeeff !important;
+    }
+
+    /* Button Styling */
+    .mdc-button--raised {
+        border-radius: 6px;
+        font-size: 0.8rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .mdc-button--raised:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .icon-button {
+        padding: 6px !important;
+        min-width: auto !important;
+        width: 36px;
+        height: 36px;
+    }
+
+    .filled-button--light {
+        background-color: #e0e7ff;
+        color: #375dfb;
+    }
+
+    .filled-button--light:hover {
+        background-color: #c9d8fd;
+    }
+
+    .filled-button--danger {
+        background-color: #ffd8d8;
+        color: #d92525;
+    }
+
+    .filled-button--danger:hover {
+        background-color: #ffb8b8;
+    }
+
+    /* Title Styling */
+    .card-title {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #2a2a2a;
+    }
+
+    /* Responsive Padding */
+    @media (max-width: 576px) {
+        .table thead th,
+        .table tbody td {
+            font-size: 0.85rem;
+            padding: 8px;
+            z-index: 0;
+        }
+    }
+</style>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Designations List</h4>
+            <div class="text-start">
+                <button class="mdc-button mdc-button--raised mdc-ripple-upgraded btn-sm" id="create_new">
+                    <i class="material-icons mdc-button__icon">add</i><span> Add New</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+
+<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+    <div class="mdc-card">
+        <div class="table-wrapper">
+            <table class="table table-striped table-bordered">
+                <colgroup>
+                    <col width="15%">
+                    <col width="25%">
+                    <col width="35%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="text-center py-1">S.No.</th>
+                        <th class="text-center py-1">Designations</th>
+                        <th class="text-center py-1">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for position in positions %}
+                    <tr>
+                        <td class="px-2 py-1 text-center">{{ forloop.counter }}</td>
+                        <td class="px-2 py-1 text-start">{{ position.name }}</td>
+                        <td class="px-2 py-1 text-center">
+                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--light mdc-ripple-upgraded edit-data" type="button" data-id="{{ position.pk }}" title="Edit">
+                                <i class="material-icons mdc-button__icon">edit</i>
+                            </button>
+                            <button class="mdc-button mdc-button--raised p-1 icon-button filled-button--danger mdc-ripple-upgraded delete-data" type="button" data-id="{{ position.pk }}" title="Delete">
+                                <i class="material-icons mdc-button__icon">delete_outline</i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock pageContent %}
+{% block ScriptBlock %}
+
+<script>
+    $(function() {
+        $('#create_new').click(function() {
+            uni_modal("Add New Position", "{% url 'manage_positions-page' %}")
+        })
+        $('.edit-data').click(function() {
+            uni_modal("Edit Position", "{% url 'manage_positions-page' %}?id=" + $(this).attr('data-id'))
+        })
+        $('.delete-data').click(function() {
+            _conf("Are you sure to delete this position?", "delete_position", [$(this).attr('data-id')])
+        })
+    })
+
+    function delete_position($id) {
+        start_loader();
+        $.ajax({
+            headers: {
+                "X-CSRFToken": '{{csrf_token}}'
+            },
+            url: "{% url 'delete-designation' %}",
+            method: "POST",
+            data: {
+                id: $id
+            },
+            dataType: "json",
+            error: err => {
+                console.log(err)
+                alert_toast("An error occured.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                if (typeof resp == 'object' && resp.status == 'success') {
+                    location.reload();
+                } else {
+                    alert_toast("An error occured.", 'error');
+                    end_loader();
+                }
+            }
+        })
+    }
+</script>
+
+{% endblock ScriptBlock %}
