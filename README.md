@@ -79,10 +79,10 @@ Before setting up the project, ensure you have the following installed:
 hrms/
 ├── manage.py                  # Django management script
 ├── README.md                  # Project documentation
-├── requirements.txt           # List of Python dependencies
-├── employee_app/              # Main application directory
+├── Department_Designation/    # Department and Designation application directory
+├── employee_app/              # Employee/user application directory
+├── employee_information/      # Hr/Admin application directory
 │   ├── migrations/            # Database migrations
-│   ├── static/                # Static files (CSS, JS, images)
 │   ├── templates/             # HTML templates
 │   ├── admin.py               # Admin configurations
 │   ├── apps.py                # App configurations
@@ -90,6 +90,7 @@ hrms/
 │   ├── urls.py                # URL routing
 │   ├── views.py               # View logic
 ├── media/                     # Uploaded files (e.g., profile photos, documents)
+├── static/                    # Static files (CSS, JS, images) 
 └── ...
 ```
 ---
