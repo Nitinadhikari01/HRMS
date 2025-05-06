@@ -30,7 +30,7 @@
 Before setting up the project, ensure you have the following installed:
 - Python 3.8 or higher
 - Django 4.x
-- PostgreSQL or SQLite (for database)
+- PostgreSQL or MySQL (for database)
 - Node.js and npm (if using frontend tools like Toastr.js)
 ---
 ## Installation
