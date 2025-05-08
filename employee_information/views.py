@@ -604,3 +604,81 @@ def get_leave_details(request):
             'status': 'error',
             'message': 'No leave record found for this employee.'
         })
+
+
+
+
+
+
+
+def save_emp_bnk_details(request):
+    if request.method == 'POST':
+        try:
+            employee_id = request.POST.get('employee_id')
+
+            pan_card_number = request.POST.get('pan_card_number')
+            acc_holder_name = request.POST.get('acc_holder_name')
+            acc_no = request.POST.get('acc_no')
+            IFSC = request.POST.get('IFSC')
+            bnk_name = request.POST.get('bnk_name')
+
+            employee = Employees.objects.get(id=employee_id)
+
+            if employee.pan_num:
+                if pan_card_number:
+                    employee.pan_num = pan_card_number
+            else:
+                employee.pan_num = pan_card_number
+
+            employee.save()
+
+            save_details, created = BankDetails.objects.update_or_create(employee=employee)
+
+            save_details.acc_holder_name = acc_holder_name
+            save_details.account_num = acc_no
+            save_details.ifsc = IFSC
+            save_details.bank_name = bnk_name
+
+            save_details.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Bank details Added successfully.'})
+        except Exception as e:
+            return JsonResponse({'status': 'failed', 'message': str(e)})
+    else:
+        return JsonResponse({'status': 'failed', 'message': 'Invalid request method.'})
+
+
+def get_emp_bnk_details(request):
+    if request.method == 'GET':
+        try:
+            employee_id = request.GET.get('employee_id')
+            if not employee_id:
+                return JsonResponse({'status': 'failed', 'message': 'Employee ID not provided.'})
+
+            save_details = Employees.objects.filter(id=employee_id).first()
+
+            if not save_details:
+                return JsonResponse({'status': 'failed', 'message': 'Employee not found.'})
+
+            bnk_details = BankDetails.objects.filter(employee_id=employee_id).values().first()
+
+            if bnk_details:
+                employee_data = {
+                    "id": save_details.id,
+                    "pan_num": save_details.pan_num,
+                }
+
+                return JsonResponse({
+                    'status': 'success',
+                    'save_details': employee_data,
+                    'bnk_details': bnk_details
+                })
+            else:
+                return JsonResponse({'status': 'failed', 'message': 'Bank details not found.'})
+
+        except Exception as e:
+            print(e)
+            return JsonResponse({'status': 'failed', 'message': 'An error occurred: ' + str(e)})
+
+    else:
+        return JsonResponse({'status': 'failed', 'message': 'Invalid request method.'})

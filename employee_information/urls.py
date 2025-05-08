@@ -42,6 +42,10 @@ urlpatterns = [
     path('save-exit-details/', views.save_exit_details, name='save_exit_details'),
     # path('delete-exit-details/', views.delete_exit_details, name='delete_exit_details'),
     path('get-exit-details/', views.get_exit_details, name='get_exit_details'),
+
+
+    path('get_emp_bnk_details/', views.get_emp_bnk_details, name='get_emp_bnk_details'),
+    path('save_emp_bnk_details/', views.save_emp_bnk_details, name='save_emp_bnk_details'),
 ]
 
 

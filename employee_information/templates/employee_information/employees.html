@@ -154,6 +154,11 @@
                     </button>
                   </td>
                   <td class="text-center">
+                    <button class="btn btn-sm btn-outline-info bank-details" data-name="{{ employee.firstname }} {{ employee.middlename }} {{ employee.lastname }}" data-id="{{ employee.pk }}" title="Bank Details">
+                      <i class="fa-solid fa-building-columns"></i>
+                    </button>
+                  </td>
+                  <td class="text-center">
                     {% if employee.status == 1 %}
                     <span class="badge bg-primary rounded-pill">Active</span>
                     {% else %}
@@ -186,6 +191,91 @@
     </div>
   </div>
 </div>
+
+
+<!--Bank Model-->
+<style>
+      /* Modal Styling */
+    #bankModal .modal-dialog {
+        max-width: 800px;
+        width: 100%;
+        margin: 1.5rem auto;
+        height: 650px;
+        max-height: 650px;
+        overflow-y: auto;
+    }
+
+    #bankModal .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        height: 100%;
+    }
+
+    #bankModal .modal-header {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background-color: #f8faff;
+        border-bottom: 1px solid #e3ebf6;
+    }
+
+    #bankModal .modal-title {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    #bankModal .modal-body {
+        padding: 1.5rem;
+        background-color: #ffffff;
+        height: calc(100% - 100px);
+    }
+</style>
+
+<div class="modal fade" id="bankModal" tabindex="-1" aria-labelledby="bankModalLabel" aria-hidden="true"
+      data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bankModalLabel">Bank Details of "<label id="name_for_bank"></label>"</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="UploadDocumentForm" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="employee_id" value="" />
+              <div class="row mt-3 g-3">
+                <div class="col-md-4">
+                  <label for="pan_card_number" class="form-label">PAN Number</label>
+                  <input type="text" name="pan_card_number" id="pan_card_number" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                  <label for="acc_holder_name" class="form-label">Account Holder Name</label>
+                  <input type="text" name="acc_holder_name" id="acc_holder_name" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                  <label for="acc_no" class="form-label">Account Number</label>
+                  <input type="text" name="acc_no" id="acc_no" class="form-control form-control-sm">
+                </div>
+              </div>
+
+              <div class="row mt-3 g-3">
+                <div class="col-md-4">
+                  <label for="IFSC" class="form-label">IFSC</label>
+                  <input type="text" name="IFSC" id="IFSC" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                  <label for="bnk_name" class="form-label">Bank Name</label>
+                  <input type="text" name="bnk_name" id="bnk_name" class="form-control form-control-sm">
+                </div>
+              </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Save Details</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
 
 <!-- Leave Modal -->
@@ -727,6 +817,85 @@
             }
         })
     }
+</script>
+
+
+<script>
+    $(function () {
+      $('.bank-details').click(function () {
+          const employeeId = $(this).attr('data-id');
+          $('#bankModal input[name="employee_id"]').val(employeeId);
+          load_document_details(employeeId);
+          $('#bankModal').modal('show');
+          const fullName = $(this).attr('data-name');
+          $('#name_for_bank').text(fullName);
+      });
+
+      function reset_bank_modal(){
+          $('#pan_card_number').val('');
+          $('#acc_holder_name').val('');
+          $('#acc_no').val('');
+          $('#IFSC').val('');
+          $('#bnk_name').val('');
+      }
+
+
+      function load_document_details(employeeId) {
+          $.ajax({
+              url: "{% url 'get_emp_bnk_details' %}",
+              type: 'GET',
+              data: { employee_id: employeeId },
+              success: function (response) {
+                  if (response.status === 'success') {
+                      const saveDetails = response.save_details;
+                      const BankDetails = response.bnk_details;
+
+                      $('#pan_card_number').val(saveDetails['pan_num']);
+                      $('#acc_holder_name').val(BankDetails.acc_holder_name);
+                      $('#acc_no').val(BankDetails.account_num);
+                      $('#IFSC').val(BankDetails.ifsc);
+                      $('#bnk_name').val(BankDetails.bank_name);
+
+                  } else {
+                      console.log('No Bank Details found.');
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error('Error:', error);
+                  alert('An error occurred while loading Bank details.');
+              },
+          });
+      }
+
+      $('#UploadDocumentForm').on('submit', function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          $.ajax({
+              url: "{% url 'save_emp_bnk_details' %}",
+              type: 'POST',
+              data: formData,
+              processData: false,
+              contentType: false,
+              headers: {
+                  'X-CSRFToken': '{{ csrf_token }}',
+              },
+              success: function (response) {
+                  if (response.status === 'success') {
+                      alert(response.message);
+                      $('#bankModal').modal('hide');
+                      reset_bank_modal();
+                  } else {
+                      alert('Error: ' + response.message);
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error('Error:', error);
+                  alert('An error occurred while saving the exit details.');
+              },
+          });
+      });
+    });
 </script>
 
 

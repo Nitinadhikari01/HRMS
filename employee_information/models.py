@@ -29,6 +29,10 @@ class DocumentAccess(models.Model):
     offer_letter = models.FileField(upload_to='documents/offer_letter/', blank=True, null=True)
     company_policies = models.FileField(upload_to='documents/company_policies', blank=True, null=True)
 
+    aadhar_card = models.FileField(upload_to='documents/aadhar_card/', blank=True, null=True)
+    pan_card = models.FileField(upload_to='documents/pan_card/', blank=True, null=True)
+    edu_certificate = models.FileField(upload_to='documents/edu_certificate', blank=True, null=True)
+
     date_added = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(auto_now=True)
 
@@ -66,6 +70,8 @@ class Employees(models.Model):
 
     emergency_contact_name = models.TextField(blank=True, null=True)
     emergency_contact_number = models.TextField(blank=True, null=True)
+
+    pan_num = models.CharField(max_length=15, blank=True, null=True)
 
     document = models.OneToOneField(DocumentAccess, on_delete=models.CASCADE, blank=True, null=True)
 
@@ -115,6 +121,17 @@ class Employees(models.Model):
 
     def __str__(self):
         return self.firstname + ' ' +self.middlename + ' '+self.lastname + ' '
+
+
+class BankDetails(models.Model):
+    employee = models.ForeignKey(Employees, on_delete=models.CASCADE, blank=True, null=True)
+    acc_holder_name = models.CharField(max_length=100, null=True, blank=True)
+    account_num = models.CharField(max_length=30, null=True, blank=True)
+    ifsc = models.CharField(max_length=30, null=True, blank=True)
+    bank_name = models.CharField(max_length=100, null=True, blank=True)
+
+    date_added = models.DateTimeField(default=timezone.now)
+    date_updated = models.DateTimeField(auto_now=True)
 
 
 class EmployeeLeave(models.Model):
