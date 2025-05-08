@@ -212,6 +212,10 @@ def save_employee(request):
             offer_letter = request.FILES.get('offer_letter')
             company_policies = request.FILES.get('company_policies')
 
+            aadhar_card = request.FILES.get('aadhar_card')
+            pan_card = request.FILES.get('pan_card')
+            edu_cert = request.FILES.get('edu_cert')
+
             if (data['id']).isnumeric() and int(data['id']) > 0:
                 # Updating an existing employee
                 # Updating an existing employee
@@ -248,18 +252,27 @@ def save_employee(request):
                         employee.document.offer_letter = offer_letter
                     if company_policies:
                         employee.document.company_policies = company_policies
+                    if aadhar_card:
+                        employee.document.aadhar_card = aadhar_card
+                    if pan_card:
+                        employee.document.pan_card = pan_card
+                    if edu_cert:
+                        employee.document.edu_certificate = edu_cert
                     employee.document.save()
                 else:
                     document = DocumentAccess.objects.create(
                         appointment_document=appointment_document,
                         offer_letter=offer_letter,
-                        company_policies=company_policies
+                        company_policies=company_policies,
+                        aadhar_card = aadhar_card,
+                        pan_card = pan_card,
+                        edu_certificate = edu_cert
                     )
                     employee.document = document
 
                 employee.save()  # Final save
 
-                # 👇 Deactivate/Activate associated user based on employee status
+                # Deactivate/Activate associated user based on employee status
                 if employee.user:
                     employee.user.is_active = (employee.status == '1')  # or employee.status for BooleanField
                     employee.user.save(update_fields=['is_active'])
@@ -270,7 +283,10 @@ def save_employee(request):
                 document = DocumentAccess.objects.create(
                     appointment_document=appointment_document,
                     offer_letter=offer_letter,
-                    company_policies=company_policies
+                    company_policies=company_policies,
+                    aadhar_card = aadhar_card,
+                    pan_card = pan_card,
+                    edu_certificate = edu_cert
                 )
                 employee = Employees(
                     emp_code=data['emp_code'],

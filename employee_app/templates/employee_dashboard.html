@@ -252,6 +252,47 @@
         }
   </style>
 
+
+    <!-- uploadDocumentModal -->
+
+  <style>
+          /* Modal Styling */
+        #uploadDocumentModal .modal-dialog {
+            max-width: 800px;
+            width: 100%;
+            margin: 1.5rem auto;
+            height: 650px;
+            max-height: 650px;
+            overflow-y: auto;
+        }
+
+        #uploadDocumentModal .modal-content {
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+            height: 100%;
+        }
+
+        #uploadDocumentModal .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f8faff;
+            border-bottom: 1px solid #e3ebf6;
+        }
+
+        #uploadDocumentModal .modal-title {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        #uploadDocumentModal .modal-body {
+            padding: 1.5rem;
+            background-color: #ffffff;
+            height: calc(100% - 100px);
+        }
+    </style>
+
+
   <!-- Asset Details Modal -->
   <style>
     /* Modal Styling */
@@ -775,6 +816,76 @@
         </div>
       </div>
     </div>
+
+
+
+
+  <!-- Bank Details Modal -->
+  <div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true"
+      data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="uploadDocumentModalLabel">Upload The Necessary Documents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="UploadDocumentForm" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="employee_id" value="" />
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label for="aadhar_card" class="form-label">Aadhar Card</label>
+                  <input type="file" name="aadhar_card" id="aadhar_card" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
+                  <small id="aadhar_card_display" class="text-muted"></small>
+                </div>
+                <div class="col-md-4">
+                  <label for="pan_card" class="form-label">Pan Card</label>
+                  <input type="file" name="pan_card" id="pan_card" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
+                  <small id="pan_card_display" class="text-muted"></small>
+                </div>
+                <div class="col-md-4">
+                  <label for="eduction_certificate" class="form-label">Education Certificate</label>
+                  <input type="file" name="eduction_certificate" id="eduction_certificate" class="form-control form-control-sm" accept=".pdf,.doc,.docx">
+                  <small id="eduction_certificate_display" class="text-muted"></small>
+                </div>
+              </div>
+              <div class="row mt-3 g-3">
+                <div class="col-md-4">
+                  <label for="pan_card_number" class="form-label">PAN Number</label>
+                  <input type="text" name="pan_card_number" id="pan_card_number" class="form-control form-control-sm">
+
+                </div>
+                <div class="col-md-4">
+                  <label for="acc_holder_name" class="form-label">Account Holder Name</label>
+                  <input type="text" name="acc_holder_name" id="acc_holder_name" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                  <label for="acc_no" class="form-label">Account Number</label>
+                  <input type="text" name="acc_no" id="acc_no" class="form-control form-control-sm">
+                </div>
+              </div>
+
+              <div class="row mt-3 g-3">
+                <div class="col-md-4">
+                  <label for="IFSC" class="form-label">IFSC</label>
+                  <input type="text" name="IFSC" id="IFSC" class="form-control form-control-sm">
+                </div>
+                <div class="col-md-4">
+                  <label for="bnk_name" class="form-label">Bank Name</label>
+                  <input type="text" name="bnk_name" id="bnk_name" class="form-control form-control-sm">
+                </div>
+              </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">Save Details</button>
+                </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   <div class="modal fade" id="uni_modal" role='dialog'>
         <div class="modal-dialog modal-md modal-dialog-centered" role="document">
             <div class="modal-content rounded-0">
@@ -1007,6 +1118,158 @@
       }
     });
   </script>
+
+
+<!-- Document Upload -->
+<script>
+    $(function () {
+        function reset_upload_document_modal() {
+            $('#aadhar_card_display').empty();
+            $('#pan_card_display').empty();
+            $('#eduction_certificate_display').empty();
+
+            $('#pan_card_number').val('');
+            $('#acc_holder_name').val('');
+            $('#acc_no').val('');
+            $('#IFSC').val('');
+            $('#bnk_name').val('');
+
+        }
+
+        $('.emp-document_upload').click(function () {
+            const employeeId = $(this).attr('data-id');
+            $('#uploadDocumentModal input[name="employee_id"]').val(employeeId);
+            $('#uploadDocumentModal').modal('show');
+            load_document_details(employeeId);
+        });
+
+
+        function validateFile(input, maxSizeMB, allowedTypes, fieldName) {
+            const file = input.files[0];
+            if (!file) return true;
+            const maxSizeBytes = maxSizeMB * 1024 * 1024;
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+
+            if (file.size > maxSizeBytes) {
+                alert(`${fieldName} file size exceeds ${maxSizeMB}MB.`);
+                input.value = '';
+                return false;
+            }
+
+            let isValidType = false;
+            for (const type of allowedTypes) {
+                if (fileType === type || fileName.endsWith(type)) {
+                    isValidType = true;
+                    break;
+                }
+            }
+            if (!isValidType) {
+                alert(`Invalid file type for ${fieldName}. Only ${allowedTypes.join(', ')} files are allowed.`);
+                input.value = '';
+                return false;
+            }
+            return true;
+        }
+
+
+
+
+        function load_document_details(employeeId) {
+            $.ajax({
+                url: "{% url 'get_emp_bnk_doc_details' %}",
+                type: 'GET',
+                data: { employee_id: employeeId },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        const saveDetails = response.save_details;
+                        const BankDetails = response.bnk_details;
+
+
+                        $('#pan_card_number').val(saveDetails['pan_num']);
+                        $('#acc_holder_name').val(BankDetails.acc_holder_name);
+                        $('#acc_no').val(BankDetails.account_num);
+                        $('#IFSC').val(BankDetails.ifsc);
+                        $('#bnk_name').val(BankDetails.bank_name);
+
+                        if (saveDetails['aadhar_card']) {
+                            $('#aadhar_card_display').html(
+                                `<p>Current Clearance Form: <a href="${saveDetails['aadhar_card']}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#aadhar_card_display').html('<p>No Aadhar Card Uploaded.</p>');
+                        }
+                        if (saveDetails['pan_card']) {
+                            $('#pan_card_display').html(
+                                `<p>Current Experience Letter: <a href="${saveDetails['pan_card']}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#pan_card_display').html('<p>No Pan Card Uploaded.</p>');
+                        }
+                        if (saveDetails['edu_cert']) {
+                            $('#eduction_certificate_display').html(
+                                `<p>Current Relieving Letter: <a href="${saveDetails['edu_cert']}" target="_blank">View</a></p>`
+                            );
+                        } else {
+                            $('#eduction_certificate_display').html('<p>No Educational Certificate Uploaded.</p>');
+                        }
+
+                    } else {
+                        console.log('No Uploaded Documents and Bank Details found.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading Documents and Bank details.');
+                },
+            });
+        }
+
+        $('#UploadDocumentForm').on('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            const aadhar_card = document.getElementById('aadhar_card');
+            if (!validateFile(aadhar_card, 3, ['.pdf', '.doc', '.docx'], 'Aadhar Card')) {
+                return;
+            }
+
+            const experience_letter = document.getElementById('pan_card');
+            if (!validateFile(experience_letter, 3, ['.pdf', '.doc', '.docx'], 'Pan Card')) {
+                return;
+            }
+
+            const eduction_certificate = document.getElementById('eduction_certificate');
+            if (!validateFile(eduction_certificate, 20, ['.pdf', '.doc', '.docx'], 'Education Certificate')) {
+                return;
+            }
+
+            $.ajax({
+                url: "{% url 'save_emp_bnk_doc_details' %}",
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        alert(response.message);
+                        $('#uploadDocumentModal').modal('hide');
+                        reset_upload_document_modal();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the exit details.');
+                },
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

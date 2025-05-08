@@ -284,6 +284,42 @@
                         <div class="mt-2 small text-muted">No company policies document available.</div>
                     {% endif %}
                 </div>
+                <br><br>
+                <h4>Employee's Uploaded Documents:</h4>
+                <br><br>
+                <div class="col-md-4 mb-3">
+                    <label for="aadhar_card" class="control-label fw-bolder">Aadhar Card</label>
+                    <input type="file" name="aadhar_card" id="aadhar_card" class="form-control form-control-sm rounded-0" accept=".pdf,.doc,.docx">
+                    {% if employee.document and employee.document.aadhar_card %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.aadhar_card.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No Aadhar Card available.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="pan_card" class="control-label fw-bolder">Pan Card</label>
+                    <input type="file" name="pan_card" id="pan_card" class="form-control form-control-sm rounded-0" accept=".pdf,.doc,.docx">
+                    {% if employee.document and employee.document.pan_card %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.pan_card.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No Pan Card available.</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="edu_cert" class="control-label fw-bolder">Education Certificate</label>
+                    <input type="file" name="edu_cert" id="edu_cert" class="form-control form-control-sm rounded-0" accept=".pdf,.doc,.docx">
+                    {% if employee.document and employee.document.edu_certificate %}
+                        <div class="mt-2 small">
+                            <strong>Current:</strong> <a href="{{ employee.document.edu_certificate.url }}" target="_blank">View</a>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 small text-muted">No Education Certificate available.</div>
+                    {% endif %}
+                </div>
             </div>
         </div>
         <!-- Salary Slip Tab -->
